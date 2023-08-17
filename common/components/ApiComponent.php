@@ -6,9 +6,9 @@ use yii\base\Component;
 
 class ApiComponent extends Component
 {
-    const username = 'test';
-    const password = 'test';
-    const grantType = 'test';
+    const username = 'apm3';
+    const password = '123456zxc';
+    const grantType = 'password';
     const url = 'https://api.apec-uae.com/token';
     const method = 'POST';
 
@@ -37,5 +37,16 @@ class ApiComponent extends Component
         $this->expires = (!empty($response['expires_in'])) ? $response['expires_in'] : '';
 
         return $this;
+    }
+
+    public function call($method, $url, $data = false)
+    {
+        return json_decode(\Yii::$container->get(Curl::class)->call(
+            $method,
+            $url,
+            $data,
+            $this->token()->token,
+            true
+        ), true);
     }
 }

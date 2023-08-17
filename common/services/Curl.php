@@ -3,14 +3,17 @@ namespace common\services;
 
 class Curl
 {
-    public function call($method, $url, $data)
+    public function call($method, $url, $data, $token = false, $encode = false)
     {
         $curl = curl_init();
         switch ($method){
             case "POST":
                 curl_setopt($curl, CURLOPT_POST, 1);
                 if ($data)
-                    curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
+                    $data = ($encode)
+                        ? json_encode($data)
+                        : http_build_query($data);
+                    curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
                 break;
             case "PUT":
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
@@ -25,11 +28,13 @@ class Curl
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_HTTPHEADER, array(
             'Content-Type: application/json',
+            'Authorization: Bearer '.$token
         ));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         // EXECUTE:
         $result = curl_exec($curl);
+
         if(!$result)
         {
             return false;

@@ -41,6 +41,10 @@ return [
             'showScriptName' => false,
             'rules' => [
                 'get-token'=>'api/get-token',
+                'get-order-by-id'=>'api/get-order-by-id',
+                'get-order-by-customer-num'=>'api/get-order-by-customer-num',
+                'get-orders'=>'api/get-orders',
+                'create-order'=>'api/create-order',
             ],
         ],
     ],
