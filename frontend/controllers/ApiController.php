@@ -7,7 +7,7 @@ use yii\web\Controller;
 
 class ApiController extends Controller
 {
-    const url = 'https://api.apec-uae.com/api/';
+    const URL = 'https://api.apec-uae.com/api/';
 
     public function beforeAction($action)
     {
@@ -18,41 +18,27 @@ class ApiController extends Controller
     public function actionGetOrderById()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $url = self::URL.'status/'.\Yii::$app->request->queryParams['id'];
 
-        $id = \Yii::$app->request->queryParams['id'];
-        $url = self::url.'status/'.$id;
-        $response = \Yii::$app->apiComponent->call('GET', $url);
-
-        return [
-            'response' => $response,
-        ];
+        return  \Yii::$app->apiComponent->getOrder($url, 'GET', true);
     }
 
     public function actionGetOrderByCustomerNum()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $url = self::URL.'statusbycustordernum/'.\Yii::$app->request->queryParams['orderNumber'];
 
-        $number = \Yii::$app->request->queryParams['orderNumber'];
-        $url = self::url.'statusbycustordernum/'.$number;
-        $response = \Yii::$app->apiComponent->call('GET', $url);
-
-        return [
-            'response' => $response,
-        ];
+        return  \Yii::$app->apiComponent->getOrder($url, 'GET', true);
     }
 
     public function actionGetOrders()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $isActive = \Yii::$app->request->queryParams['isActive'];
-        $limit = \Yii::$app->request->queryParams['limit'];
-        $url = self::url.'getorders/'.$isActive.'/'.$limit;
+        $url = self::URL.'getorders/'
+            .\Yii::$app->request->queryParams['isActive']
+            .'/'.\Yii::$app->request->queryParams['limit'];
 
-        $response = \Yii::$app->apiComponent->call('GET', $url);
-
-        return [
-            'response' => $response,
-        ];
+        return  \Yii::$app->apiComponent->getOrder($url, 'GET', true);
     }
 
     public function actionCreateOrder()
@@ -78,7 +64,7 @@ class ApiController extends Controller
            ]],
            'DeliveryPointID' => 0,
          ];
-        $url = self::url.'order';
+        $url = self::URL.'order';
 
         $response = \Yii::$app->apiComponent->call('POST', $url, $params);
 
