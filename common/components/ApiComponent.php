@@ -8,6 +8,7 @@ class ApiComponent extends Component
 {
     public const HTTP_BAD_REQUEST = 400;
     public const HTTP_NOT_FOUND = 404;
+    const HTTP_INTERNAL_SERVER_ERROR = 500;
     public const HTTP_OK = 200;
     public const ORDER_STATUS = [
         1 => 'новый',
@@ -74,21 +75,28 @@ class ApiComponent extends Component
         ), true);
     }
 
-    public function response($response, $status = true)
+    public function response($response)
     {
-        if($status){
-            $result = [
-                'success' => $response,
-                'status' => self::HTTP_OK
-            ];
-        } else {
-            $result = [
-                'error' => $response,
+        if($response == 'Order not found'){
+            $response = [
+                'error' => 'Order not found',
                 'status' => self::HTTP_NOT_FOUND
             ];
+        } else {
+            if(isset($response["Message"]) && $response["Message"] == 'The request is invalid.'){
+                $response = [
+                    'error' => 'The request is invalid.',
+                    'status' => self::HTTP_BAD_REQUEST
+                ];
+            } elseif (isset($response["Message"]) && $response["Message"] == 'Authorization has been denied for this request.') {
+                $response = [
+                    'error' => 'Authorization has been denied for this request.',
+                    'status' => self::HTTP_BAD_REQUEST
+                ];
+            }
         }
 
-        return $result;
+        return $response;
     }
 
     public function getStatus($response)
@@ -115,17 +123,22 @@ class ApiComponent extends Component
     {
         $response = $this->call($method, $url);
 
-        if($response == 'Order not found'){
-            $response = $this->response($response, false);
-        } else {
-            if(isset($response["Message"]) && $response["Message"] == 'The request is invalid.'){
-                $response = $this->response($response, false);
-            } else {
-                $response = $this->getStatus($response);
-                $response = $this->response($response);
-            }
+        if(!$response){
+            return [
+                'error' => 'Internal server error',
+                'status' => self::HTTP_INTERNAL_SERVER_ERROR
+            ];
         }
 
-        return $response;
+        $response = $this->response($response);
+
+        if(!isset($response['error'])){
+            $result['success'] = $this->getStatus($response);
+            $result['status'] = self::HTTP_OK;
+        } else {
+            $result = $response;
+        }
+
+        return $result;
     }
 }

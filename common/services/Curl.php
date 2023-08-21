@@ -3,6 +3,7 @@ namespace common\services;
 
 class Curl
 {
+    const TIMEOUT = 20;
     public function call($method, $url, $data, $token = false, $encode = false)
     {
         $curl = curl_init();
@@ -32,6 +33,8 @@ class Curl
         ));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 0);
+        curl_setopt($curl, CURLOPT_TIMEOUT, self::TIMEOUT); //timeout in seconds
         // EXECUTE:
         $result = curl_exec($curl);
 
