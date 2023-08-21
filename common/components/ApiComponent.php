@@ -31,8 +31,8 @@ class ApiComponent extends Component
         240 => 'Новый заказ',
     ];
     const URL = 'https://api.apec-uae.com/api/';
-    const username = 'apm3';
-    const password = '123456zxc';
+    const username = '';
+    const password = '';
     const grantType = 'password';
     const url = 'https://api.apec-uae.com/token';
     const method = 'POST';
