@@ -66,13 +66,25 @@ class ApiComponent extends Component
 
     public function call($method, $url, $data = false)
     {
-        return json_decode(\Yii::$container->get(Curl::class)->call(
+        $response = \Yii::$container->get(Curl::class)->call(
             $method,
             $url,
             $data,
             $this->token()->token,
             true
-        ), true);
+        );
+
+        if(!$response){
+            return [
+                'error' => 'Internal server error',
+                'status' => self::HTTP_INTERNAL_SERVER_ERROR
+            ];
+        } else {
+            $response = json_decode($response, true);
+            $result = $this->response($response);
+        }
+
+        return $result;
     }
 
     public function response($response)
@@ -122,15 +134,6 @@ class ApiComponent extends Component
     public function getOrder($url, $method)
     {
         $response = $this->call($method, $url);
-
-        if(!$response){
-            return [
-                'error' => 'Internal server error',
-                'status' => self::HTTP_INTERNAL_SERVER_ERROR
-            ];
-        }
-
-        $response = $this->response($response);
 
         if(!isset($response['error'])){
             $result['success'] = $this->getStatus($response);
